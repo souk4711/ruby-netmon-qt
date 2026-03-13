@@ -6,7 +6,6 @@ A simple network monitor on Linux.
 
 - [Ruby](https://www.ruby-lang.org/)
 - [Qt](https://www.qt.io/)
-- [LIBpcap](https://github.com/the-tcpdump-group/libpcap)
 
 ## Installation
 

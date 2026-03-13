@@ -1,7 +1,7 @@
 class ConnsLookupService
   def perform
+    conns = {}
     ino2conn = {}
-    conns = []
 
     %w[tcp tcp6 udp udp6].each do |protocol|
       str = File.read("/proc/net/#{protocol}")
@@ -9,7 +9,7 @@ class ConnsLookupService
       sockets.each do |socket|
         conn = Netmon::Connection.new(socket)
         conn.protocol = protocol
-        conns << conn
+        conns[conn.key] = conn
         ino2conn[conn.inode] = conn
       end
     end

@@ -1,5 +1,19 @@
 module Netmon
   module ProcNet
+    TCP_STATE = {
+      "01" => "ESTABLISHED",
+      "02" => "SYN_SENT",
+      "03" => "SYN_RECV",
+      "04" => "FIN_WAIT1",
+      "05" => "FIN_WAIT2",
+      "06" => "TIME_WAIT",
+      "07" => "CLOSE",
+      "08" => "CLOSE_WAIT",
+      "09" => "LAST_ACK",
+      "0A" => "LISTEN",
+      "0B" => "CLOSING"
+    }.freeze
+
     def self.sockets_form_str(str)
       str.lines[1..].map do |line|
         linesplit = line.split
@@ -11,7 +25,7 @@ module Netmon
           local_port: format_port(local_port),
           remote_address: format_address(remote_address),
           remote_port: format_port(remote_port),
-          state: linesplit[3],
+          state: TCP_STATE[linesplit[3]],
           uid: linesplit[7].to_i,
           inode: linesplit[9].to_i
         }

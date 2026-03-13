@@ -5,6 +5,9 @@ class MainWindow < RubyQt6::Bando::QMainWindow
   def initialize
     super
 
+    initialize_central_widget
+
+    set_context_menu_policy(Qt::NoContextMenu)
     NetmonQt.settings.GET_mainwindow_geometry_and_restore_to(self)
   end
 
@@ -12,5 +15,17 @@ class MainWindow < RubyQt6::Bando::QMainWindow
     NetmonQt.settings.PUT_mainwindow_geometry(self)
 
     _close_event(evt)
+  end
+
+  private
+
+  def initialize_central_widget
+    @connstableview = ConnsTableView.new
+
+    centralwidget = QWidget.new
+    mainlayout = QHBoxLayout.new(centralwidget)
+    mainlayout.add_widget(@connstableview)
+
+    set_central_widget(centralwidget)
   end
 end
