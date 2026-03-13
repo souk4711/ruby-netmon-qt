@@ -4,10 +4,19 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
     attr_reader :itemmodel
 
-    def initialize
+    def initialize(parent)
       @dataitems = {}
 
-      @itemmodel = QStandardItemModel.new
+      @active_processes = Set.new
+      @active_protocols = Set.new
+        .add(Netmon::Connection::PROTOCOL_TCP4)
+        .add(Netmon::Connection::PROTOCOL_TCP6)
+        .add(Netmon::Connection::PROTOCOL_UDP4)
+        .add(Netmon::Connection::PROTOCOL_UDP6)
+      @active_users = Set.new
+        .add(Etc.getpwuid.name)
+
+      @itemmodel = QStandardItemModel.new(parent)
       @itemmodel.set_horizontal_header_labels(
         QStringList.new
           .push("Connection Key")
@@ -23,6 +32,18 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       )
 
       refresh
+    end
+
+    def active_processes
+      @active_processes.sort
+    end
+
+    def active_protocols
+      @active_protocols.sort
+    end
+
+    def active_users
+      @active_users.sort
     end
 
     def refresh
@@ -42,8 +63,8 @@ class ConnsTableView < RubyQt6::Bando::QWidget
         keyitem = initialize_standarditem(key)
         @dataitems[key] = DataItem.new(keyitem)
 
-        pname = conn.comm.nil? ? "" : conn.comm
-        pid = conn.pid.nil? ? "" : conn.pid.to_s
+        pname = conn.comm.nil? ? "?" : conn.comm
+        pid = conn.pid.nil? ? "?" : conn.pid.to_s
         @itemmodel.append_row(
           keyitem,
           initialize_standarditem(initialize_icon_process(pname), pname),
@@ -56,6 +77,9 @@ class ConnsTableView < RubyQt6::Bando::QWidget
           initialize_standarditem(conn.remote_address),
           initialize_standarditem(conn.remote_port.to_s)
         )
+
+        @active_processes.add(pname)
+        @active_users.add(conn.uname)
       end
     end
 
@@ -75,7 +99,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
         when "fcitx5" then "fcitx"
         when "msedge" then "microsoft-edge"
         when "kdeconnectd" then "kdeconnect"
-        when "" then "question"
+        when "?" then "question"
         else pname
         end
       QIcon.from_theme(name)

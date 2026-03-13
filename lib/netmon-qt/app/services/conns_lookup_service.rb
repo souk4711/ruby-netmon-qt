@@ -3,12 +3,12 @@ class ConnsLookupService
     conns = {}
     ino2conn = {}
 
-    %w[tcp tcp6 udp udp6].each do |protocol|
-      str = File.read("/proc/net/#{protocol}")
+    %w[tcp tcp6 udp udp6].each do |filename|
+      str = File.read("/proc/net/#{filename}")
       sockets = Netmon::ProcNet.sockets_form_str(str)
       sockets.each do |socket|
         conn = Netmon::Connection.new(socket)
-        conn.protocol = protocol
+        conn.protocol = conn_protocol(filename)
         conns[conn.key] = conn
         ino2conn[conn.inode] = conn
       end
@@ -25,5 +25,20 @@ class ConnsLookupService
     end
 
     conns
+  end
+
+  def conn_protocol(str)
+    case str
+    when "tcp"
+      Netmon::Connection::PROTOCOL_TCP4
+    when "tcp6"
+      Netmon::Connection::PROTOCOL_TCP6
+    when "udp"
+      Netmon::Connection::PROTOCOL_UDP4
+    when "udp6"
+      Netmon::Connection::PROTOCOL_UDP6
+    else
+      ""
+    end
   end
 end
