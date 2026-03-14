@@ -1,3 +1,4 @@
+require_relative "connstableview/sortfilterproxymodel"
 require_relative "connstableview/store"
 
 class ConnsTableView < RubyQt6::Bando::QWidget
@@ -5,6 +6,8 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     slot "_autorefresh()"
     slot "_on_filter_changed()"
   end
+
+  attr_reader :processfilter, :protocolfilter, :userfilter
 
   def initialize
     super
@@ -18,6 +21,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     mainlayout.add_widget(@toolbar)
     mainlayout.add_widget(@tableview)
 
+    @userfilter.set_current_text(Etc.getpwuid.name)
     @timer.start
   end
 
@@ -68,9 +72,9 @@ class ConnsTableView < RubyQt6::Bando::QWidget
   def initialize_tableview
     @tableview = QTableView.new
 
-    proxymodel = QSortFilterProxyModel.new(self)
-    proxymodel.set_source_model(@store.itemmodel)
-    @tableview.set_model(proxymodel)
+    @storeproxymodel = SortFilterProxyModel.new(self)
+    @storeproxymodel.set_source_model(@store.itemmodel)
+    @tableview.set_model(@storeproxymodel)
 
     @tableview.horizontal_header.hide_section(0)
     @tableview.vertical_header.set_visible(false)
@@ -78,8 +82,8 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     @tableview.resize_column_to_contents(6) # Local Address
     @tableview.resize_column_to_contents(8) # Remote Address
 
-    @tableview.set_sorting_enabled(true)
     @tableview.sort_by_column(1, Qt::AscendingOrder)
+    @tableview.set_sorting_enabled(true)
   end
 
   def initialize_timer_autorefresh
@@ -114,5 +118,6 @@ class ConnsTableView < RubyQt6::Bando::QWidget
   end
 
   def _on_filter_changed
+    @storeproxymodel.invalidate
   end
 end
