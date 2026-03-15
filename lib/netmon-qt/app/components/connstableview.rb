@@ -4,6 +4,7 @@ require_relative "connstableview/store"
 class ConnsTableView < RubyQt6::Bando::QWidget
   q_object do
     slot "_autorefresh()"
+    slot "_on_autorefreshbtn_changed(Qt::CheckState)"
     slot "_on_filter_changed()"
   end
 
@@ -22,7 +23,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     mainlayout.add_widget(@tableview)
 
     @userfilter.set_current_text(Etc.getpwuid.name)
-    @timer.start
+    @autorefreshbtn.set_check_state(Qt::Checked)
   end
 
   private
@@ -50,6 +51,9 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     @store.active_users.each { |user| @userfilter.add_item(user) }
     @userfilter.current_text_changed.connect(self, :_on_filter_changed)
 
+    @autorefreshbtn = QCheckBox.new("Auto Refresh")
+    @autorefreshbtn.check_state_changed.connect(self, :_on_autorefreshbtn_changed)
+
     @toolbar = QWidget.new
     @toolbarlayout = QHBoxLayout.new(@toolbar)
     @toolbarlayout.add_widget(initialize_toolbar_label("Process:"))
@@ -61,6 +65,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     @toolbarlayout.add_widget(initialize_toolbar_label("User:"))
     @toolbarlayout.add_widget(@userfilter)
     @toolbarlayout.add_stretch
+    @toolbarlayout.add_widget(@autorefreshbtn)
   end
 
   def initialize_toolbar_label(text)
@@ -115,6 +120,13 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
     update_filter_additem(@processfilter, @store.active_processes)
     update_filter_additem(@userfilter, @store.active_users)
+  end
+
+  def _on_autorefreshbtn_changed(state)
+    case state
+    when Qt::Checked then @timer.start
+    when Qt::Unchecked then @timer.stop
+    end
   end
 
   def _on_filter_changed
