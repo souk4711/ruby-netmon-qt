@@ -83,11 +83,11 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
     @tableview.horizontal_header.hide_section(0)
     @tableview.vertical_header.set_visible(false)
-    @tableview.resize_column_to_contents(1) # Process Name
-    @tableview.resize_column_to_contents(6) # Local Address
-    @tableview.resize_column_to_contents(8) # Remote Address
+    @tableview.resize_column_to_contents(COLUMN_PROCESS_NAME)
+    @tableview.resize_column_to_contents(COLUMN_LOCAL_ADDRESS)
+    @tableview.resize_column_to_contents(COLUMN_REMOTE_ADDRESS)
 
-    @tableview.sort_by_column(1, Qt::AscendingOrder)
+    @tableview.sort_by_column(COLUMN_PROCESS_NAME, Qt::AscendingOrder)
     @tableview.set_sorting_enabled(true)
   end
 

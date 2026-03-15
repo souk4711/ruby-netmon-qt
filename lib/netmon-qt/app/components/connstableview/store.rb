@@ -1,4 +1,15 @@
 class ConnsTableView < RubyQt6::Bando::QWidget
+  COLUMN_CONNECTION_KEY = 0
+  COLUMN_PROCESS_NAME = 1
+  COLUMN_PROCESS_ID = 2
+  COLUMN_PROTOCOL = 3
+  COLUMN_STATE = 4
+  COLUMN_USER = 5
+  COLUMN_LOCAL_ADDRESS = 6
+  COLUMN_LOCAL_PORT = 7
+  COLUMN_REMOTE_ADDRESS = 8
+  COLUMN_REMOTE_PORT = 9
+
   class Store
     DataItem = Struct.new(:keyitem)
 

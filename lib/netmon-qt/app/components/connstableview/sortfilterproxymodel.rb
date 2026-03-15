@@ -1,14 +1,10 @@
 class ConnsTableView < RubyQt6::Bando::QWidget
   class SortFilterProxyModel < RubyQt6::Bando::QSortFilterProxyModel
-    def initialize(parent)
-      super
-    end
-
     def filter_accepts_row(source_row, source_parent)
       {
-        1 => parent.processfilter,
-        3 => parent.protocolfilter,
-        5 => parent.userfilter
+        COLUMN_PROCESS_NAME => parent.processfilter,
+        COLUMN_PROTOCOL => parent.protocolfilter,
+        COLUMN_USER => parent.userfilter
       }.each do |column, filter|
         filter_value = filter.current_text
         next if filter_value == "*"
@@ -20,6 +16,16 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       end
 
       true
+    end
+
+    def less_than(lhs, rhs)
+      if lhs.column == COLUMN_LOCAL_PORT || lhs.column == COLUMN_REMOTE_PORT
+        lhs_data = source_model.data(lhs).value
+        rhs_data = source_model.data(rhs).value
+        lhs_data.to_s.to_i < rhs_data.to_s.to_i
+      else
+        super
+      end
     end
   end
 end
