@@ -3,8 +3,8 @@ require_relative "connstableview/store"
 
 class ConnsTableView < RubyQt6::Bando::QWidget
   q_object do
-    slot "_on_copy_action_triggered()"
     slot "_on_whois_action_triggered()"
+    slot "_on_copy_action_triggered()"
     slot "_on_autorefresh_timer_timeout()"
     slot "_on_autorefreshbtn_changed(Qt::CheckState)"
     slot "_on_filter_changed()"
@@ -35,8 +35,8 @@ class ConnsTableView < RubyQt6::Bando::QWidget
   private
 
   def initialize_actions
-    @copy_action = initialize_actions_act(QIcon::ThemeIcon::EditCopy, "Copy Current Column", :_on_copy_action_triggered)
     @whois_action = initialize_actions_act(QIcon::ThemeIcon::EditFind, "Whois", :_on_whois_action_triggered)
+    @copy_action = initialize_actions_act(QIcon::ThemeIcon::EditCopy, "Copy Current Column", :_on_copy_action_triggered)
   end
 
   def initialize_actions_act(icon, text, slot)
@@ -136,15 +136,19 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     end
   end
 
-  def _on_copy_action_triggered
-    value = @lastindex.data.value
-    QApplication.clipboard.set_text(value)
-  end
-
   def _on_whois_action_triggered
+    return unless @lastindex.valid?
+
     value = @lastindex.sibling_at_column(COLUMN_REMOTE_ADDRESS).data.value
     url = QUrl.new("https://ipinfo.io/#{value}")
     QDesktopServices.open_url(url)
+  end
+
+  def _on_copy_action_triggered
+    return unless @lastindex.valid?
+
+    value = @lastindex.data.value
+    QApplication.clipboard.set_text(value)
   end
 
   def _on_autorefresh_timer_timeout
