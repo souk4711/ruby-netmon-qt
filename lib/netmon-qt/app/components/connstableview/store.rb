@@ -124,15 +124,22 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     def initialize_icon_ipaddress(ipaddress)
       return if @geoiolookup.nil?
 
+      islocal = Netmon.local_address?(ipaddress)
+      return QIcon.from_theme(QIcon::ThemeIcon::Computer) if islocal
+
       record = @geoiolookup.get(ipaddress)
-      return QIcon.from_theme(QIcon::ThemeIcon::Computer) if record.nil?
+      return initialize_icon_ipaddress_unknown if record.nil?
 
       code = record.dig("country", "iso_code")&.downcase
-      return QIcon.from_theme(QIcon::ThemeIcon::Computer) if code.nil?
+      return initialize_icon_ipaddress_unknown if code.nil?
 
       file = "assets:/flags/#{code}.svg"
-      return QIcon.new(file) if QFile.exists(file)
+      return initialize_icon_ipaddress_unknown unless QFile.exists(file)
 
+      QIcon.new(file)
+    end
+
+    def initialize_icon_ipaddress_unknown
       pixmap = QPixmap.new(36, 36)
       pixmap.fill(QColor.new(Qt::White))
       QIcon.new(pixmap)
