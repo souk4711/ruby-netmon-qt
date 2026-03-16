@@ -172,8 +172,11 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     menu = QMenu.new("", self)
     menu.set_attribute(Qt::WA_DeleteOnClose)
 
-    remote_address = @lastindex.sibling_at_column(COLUMN_REMOTE_ADDRESS).data.value
+    remote_address = @lastindex.sibling_at_column(COLUMN_REMOTE_ADDRESS).data.value.to_s
+    remote_address = remote_address.include?(".") ? remote_address : remote_address[..11] + "..."
+
     @whois_action.set_text("Whois #{remote_address} - via IPinfo")
+    @copy_action.set_text("Copy \"#{@lastindex.data.value}\"")
 
     menu.add_action(@whois_action)
     menu.add_action(@copy_action)
