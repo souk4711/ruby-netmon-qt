@@ -113,8 +113,9 @@ class ConnsTableView < RubyQt6::Bando::QWidget
         case pname
         when "adb" then "android-file-transfer"
         when "fcitx5" then "fcitx"
-        when "msedge" then "microsoft-edge"
         when "kdeconnectd" then "kdeconnect"
+        when "msedge" then "microsoft-edge"
+        when "ssh" then "terminal"
         when "?" then "question"
         else pname
         end
