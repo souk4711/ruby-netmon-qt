@@ -104,7 +104,6 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     def initialize_standarditem(*args)
       item = QStandardItem.new(*args.compact)
       item.set_editable(false)
-      item.set_selectable(false)
       item
     end
 

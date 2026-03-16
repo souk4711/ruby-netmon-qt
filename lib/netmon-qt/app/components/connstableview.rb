@@ -3,9 +3,11 @@ require_relative "connstableview/store"
 
 class ConnsTableView < RubyQt6::Bando::QWidget
   q_object do
-    slot "_autorefresh()"
+    slot "_on_copy_action_triggered()"
+    slot "_on_autorefresh_timer_timeout()"
     slot "_on_autorefreshbtn_changed(Qt::CheckState)"
     slot "_on_filter_changed()"
+    slot "_on_tableview_custom_context_menu_requested(QPoint)"
   end
 
   attr_reader :processfilter, :protocolfilter, :userfilter
@@ -13,6 +15,9 @@ class ConnsTableView < RubyQt6::Bando::QWidget
   def initialize
     super
 
+    @lastindex = nil
+
+    initialize_actions
     initialize_store
     initialize_toolbar
     initialize_tableview
@@ -27,6 +32,16 @@ class ConnsTableView < RubyQt6::Bando::QWidget
   end
 
   private
+
+  def initialize_actions
+    @copy_action = initialize_actions_act(QIcon::ThemeIcon::EditCopy, "Copy Current Column", :_on_copy_action_triggered)
+  end
+
+  def initialize_actions_act(icon, text, slot)
+    action = QAction.new(QIcon.from_theme(icon), text, self)
+    action.triggered.connect(self, slot)
+    action
+  end
 
   def initialize_store
     @store = Store.new(self)
@@ -76,6 +91,10 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
   def initialize_tableview
     @tableview = QTableView.new
+    @tableview.set_selection_behavior(QAbstractItemView::SelectRows)
+    @tableview.set_selection_mode(QAbstractItemView::SingleSelection)
+    @tableview.set_context_menu_policy(Qt::ContextMenuPolicy::CustomContextMenu)
+    @tableview.custom_context_menu_requested.connect(self, :_on_tableview_custom_context_menu_requested)
 
     @storeproxymodel = SortFilterProxyModel.new(self)
     @storeproxymodel.set_source_model(@store.itemmodel)
@@ -94,7 +113,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
   def initialize_timer_autorefresh
     @timer = QTimer.new(self)
     @timer.set_interval(4_000)
-    @timer.timeout.connect(self, :_autorefresh)
+    @timer.timeout.connect(self, :_on_autorefresh_timer_timeout)
   end
 
   def update_filter_additem(filter, items)
@@ -115,7 +134,12 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     end
   end
 
-  def _autorefresh
+  def _on_copy_action_triggered
+    value = @lastindex.data.value
+    QApplication.clipboard.set_text(value)
+  end
+
+  def _on_autorefresh_timer_timeout
     @store.refresh
 
     update_filter_additem(@processfilter, @store.active_processes)
@@ -131,5 +155,17 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
   def _on_filter_changed
     @storeproxymodel.invalidate
+  end
+
+  def _on_tableview_custom_context_menu_requested(position)
+    @lastindex = @tableview.index_at(position)
+    return unless @lastindex.valid?
+
+    menu = QMenu.new("", self)
+    menu.set_attribute(Qt::WA_DeleteOnClose)
+
+    menu.add_action(@copy_action)
+
+    menu.exec(@tableview.viewport.map_to_global(position))
   end
 end
