@@ -1,4 +1,6 @@
 class ConnsTableView < RubyQt6::Bando::QWidget
+  GEOLITE2_MMDB = "/usr/share/GeoIP/GeoLite2-Country.mmdb"
+
   COLUMN_CONNECTION_KEY = 0
   COLUMN_PROCESS_NAME = 1
   COLUMN_PROCESS_ID = 2
@@ -16,7 +18,9 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     attr_reader :itemmodel
 
     def initialize(parent)
-      @dataitems = {}
+      @geoiolookup = MaxMind::DB.new(
+        GEOLITE2_MMDB, mode: MaxMind::DB::MODE_MEMORY
+      )
 
       @active_processes = Set.new
       @active_protocols = Set.new
@@ -27,6 +31,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       @active_users = Set.new
         .add(Etc.getpwuid.name)
 
+      @dataitems = {}
       @itemmodel = QStandardItemModel.new(parent)
       @itemmodel.set_horizontal_header_labels(
         QStringList.new
@@ -83,9 +88,9 @@ class ConnsTableView < RubyQt6::Bando::QWidget
           initialize_standarditem(conn.protocol),
           initialize_standarditem(conn.state),
           initialize_standarditem(conn.uname),
-          initialize_standarditem(conn.local_address),
+          initialize_standarditem(initialize_icon_ipaddress(conn.local_address), conn.local_address),
           initialize_standarditem(conn.local_port.to_s),
-          initialize_standarditem(conn.remote_address),
+          initialize_standarditem(initialize_icon_ipaddress(conn.remote_address), conn.remote_address),
           initialize_standarditem(conn.remote_port.to_s)
         )
 
@@ -97,7 +102,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     private
 
     def initialize_standarditem(*args)
-      item = QStandardItem.new(*args)
+      item = QStandardItem.new(*args.compact)
       item.set_editable(false)
       item.set_selectable(false)
       item
@@ -114,6 +119,23 @@ class ConnsTableView < RubyQt6::Bando::QWidget
         else pname
         end
       QIcon.from_theme(name)
+    end
+
+    def initialize_icon_ipaddress(ipaddress)
+      return if @geoiolookup.nil?
+
+      record = @geoiolookup.get(ipaddress)
+      return QIcon.from_theme(QIcon::ThemeIcon::Computer) if record.nil?
+
+      code = record.dig("country", "iso_code")&.downcase
+      return QIcon.from_theme(QIcon::ThemeIcon::Computer) if code.nil?
+
+      file = "assets:/flags/#{code}.svg"
+      return QIcon.new(file) if QFile.exists(file)
+
+      pixmap = QPixmap.new(36, 36)
+      pixmap.fill(QColor.new(Qt::White))
+      QIcon.new(pixmap)
     end
   end
 end

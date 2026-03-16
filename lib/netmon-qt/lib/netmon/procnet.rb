@@ -34,8 +34,8 @@ module Netmon
 
     def self.format_address(str)
       case str.size
-      when 8 then str.scan(/.{2}/).map { |s| s.to_i(16) }.join(".")
-      when 32 then str.scan(/.{4}/).join(":")
+      when 8 then str.scan(/.{2}/).reverse.map { |s| s.to_i(16) }.join(".")
+      when 32 then str.scan(/.{8}/).map { |s| s.scan(/.{2}/).reverse }.join.scan(/.{4}/).join(":")
       else raise "Invalid address str: #{str}"
       end
     end

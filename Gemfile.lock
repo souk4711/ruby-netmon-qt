@@ -28,6 +28,7 @@ PATH
   remote: .
   specs:
     ruby-netmon-qt (0.0.1)
+      maxmind-db (~> 1.4.0)
       ruby-qt6-qtwidgets (~> 6.0.0)
 
 GEM
@@ -53,6 +54,7 @@ GEM
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     logger (1.7.0)
+    maxmind-db (1.4.0)
     nokogiri (1.19.0-x86_64-linux-gnu)
       racc (~> 1.4)
     observer (0.1.2)
