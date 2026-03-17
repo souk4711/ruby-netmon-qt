@@ -1,7 +1,5 @@
 class ConnsTableView < RubyQt6::Bando::QWidget
   # rubocop:disable Layout
-  GEOLITE2_MMDB = "/usr/share/GeoIP/GeoLite2-Country.mmdb"
-
   COLUMN_CONNECTION_KEY = 0
   COLUMN_PROCESS_NAME   = 1
   COLUMN_PROCESS_ID     = 2
@@ -51,7 +49,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
     def initialize(parent)
       @geoiolookup = begin
-        MaxMind::DB.new(GEOLITE2_MMDB, mode: MaxMind::DB::MODE_MEMORY)
+        MaxMind::DB.new(NetmonQt.settings.GET_geolite2_mmdb, mode: MaxMind::DB::MODE_MEMORY)
       rescue Errno::EACCES, Errno::ENOENT
       end
 

@@ -132,7 +132,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
   def initialize_timer_autorefresh
     @timer = QTimer.new(self)
-    @timer.set_interval(4_000)
+    @timer.set_interval(NetmonQt.settings.GET_connections_check_interval)
     @timer.timeout.connect(self, :_on_autorefresh_timer_timeout)
   end
 

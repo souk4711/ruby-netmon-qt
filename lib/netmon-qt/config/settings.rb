@@ -11,5 +11,23 @@ module NetmonQt
       settings.set_value("MainWindow/geometry", mainwindow.save_geometry)
       settings.set_value("MainWindow/windowState", mainwindow.save_state)
     end
+
+    def GET_connections_check_interval
+      default_connections_check_interval
+    end
+
+    def GET_geolite2_mmdb
+      default_geolite2_mmdb
+    end
+
+    private
+
+    def default_connections_check_interval
+      4_000
+    end
+
+    def default_geolite2_mmdb
+      "/usr/share/GeoIP/GeoLite2-Country.mmdb"
+    end
   end
 end
