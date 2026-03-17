@@ -29,7 +29,6 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     mainlayout.add_widget(@toolbar)
     mainlayout.add_widget(@tableview)
 
-    @userfilter.set_current_text(Etc.getpwuid.name)
     @autorefreshbtn.set_check_state(Qt::Checked)
   end
 

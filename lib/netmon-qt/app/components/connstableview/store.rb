@@ -189,7 +189,6 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       keyitemindex = keyitem.index
 
       {
-        COLUMN_PROCESS_NAME => conn.comm_text,
         COLUMN_PROCESS_ID => conn.pid_text,
         COLUMN_STATE => conn.state,
         COLUMN_USER => conn.uname
