@@ -1,14 +1,28 @@
 module Netmon
   class Connection
-    PROTOCOL_TCP = "TCP"
-    PROTOCOL_UDP = "UDP"
+    # rubocop:disable Layout
+    PROTOCOL_TCP  = "TCP"
+    PROTOCOL_UDP  = "UDP"
     PROTOCOL_TCP4 = "TCP v4"
     PROTOCOL_TCP6 = "TCP v6"
     PROTOCOL_UDP4 = "UDP v4"
     PROTOCOL_UDP6 = "UDP v6"
 
+    STATE_ESTABLISHED = "ESTABLISHED"
+    STATE_LISTEN      = "LISTEN"
+    STATE_SYN_SENT    = "SYN_SENT"
+    STATE_SYN_RECV    = "SYN_RECV"
+    STATE_FIN_WAIT1   = "FIN_WAIT1"
+    STATE_FIN_WAIT2   = "FIN_WAIT2"
+    STATE_CLOSING     = "CLOSING"
+    STATE_CLOSE_WAIT  = "CLOSE_WAIT"
+    STATE_LAST_ACK    = "LAST_ACK"
+    STATE_TIME_WAIT   = "TIME_WAIT"
+    STATE_CLOSE       = "CLOSE"
+
     COMM_DEFUNCT = "<defunct>"
     COMM_UNKNOWN = "<unknown>"
+    # rubocop:enable Layout
 
     attr_accessor :protocol
     attr_accessor :local_address, :local_port

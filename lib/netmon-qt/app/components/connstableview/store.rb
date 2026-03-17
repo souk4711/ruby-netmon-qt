@@ -1,16 +1,48 @@
 class ConnsTableView < RubyQt6::Bando::QWidget
+  # rubocop:disable Layout
   GEOLITE2_MMDB = "/usr/share/GeoIP/GeoLite2-Country.mmdb"
 
   COLUMN_CONNECTION_KEY = 0
-  COLUMN_PROCESS_NAME = 1
-  COLUMN_PROCESS_ID = 2
-  COLUMN_PROTOCOL = 3
-  COLUMN_STATE = 4
-  COLUMN_USER = 5
-  COLUMN_LOCAL_ADDRESS = 6
-  COLUMN_LOCAL_PORT = 7
+  COLUMN_PROCESS_NAME   = 1
+  COLUMN_PROCESS_ID     = 2
+  COLUMN_PROTOCOL       = 3
+  COLUMN_STATE          = 4
+  COLUMN_USER           = 5
+  COLUMN_LOCAL_ADDRESS  = 6
+  COLUMN_LOCAL_PORT     = 7
   COLUMN_REMOTE_ADDRESS = 8
-  COLUMN_REMOTE_PORT = 9
+  COLUMN_REMOTE_PORT    = 9
+
+  # Traffic Light Color Palette
+  COLORS_TCP_STATE = {
+    Netmon::Connection::STATE_ESTABLISHED => "#27AE60",
+    Netmon::Connection::STATE_LISTEN      => "#2980B9",
+    Netmon::Connection::STATE_SYN_SENT    => "#F1C40F",
+    Netmon::Connection::STATE_SYN_RECV    => "#F1C40F",
+    Netmon::Connection::STATE_FIN_WAIT1   => "#8E44AD",
+    Netmon::Connection::STATE_FIN_WAIT2   => "#8E44AD",
+    Netmon::Connection::STATE_CLOSING     => "#9B59B6",
+    Netmon::Connection::STATE_CLOSE_WAIT  => "#E67E22",
+    Netmon::Connection::STATE_LAST_ACK    => "#D35400",
+    Netmon::Connection::STATE_TIME_WAIT   => "#7F8C8D",
+    Netmon::Connection::STATE_CLOSE       => "#C0392B"
+  }
+
+  # Blue To Cyan Color Palette
+  COLORS_UDP_STATE = {
+    Netmon::Connection::STATE_ESTABLISHED => "#1ABC9C",
+    Netmon::Connection::STATE_LISTEN      => "#3498DB",
+    Netmon::Connection::STATE_SYN_SENT    => "#9B59B6",
+    Netmon::Connection::STATE_SYN_RECV    => "#9B59B6",
+    Netmon::Connection::STATE_FIN_WAIT1   => "#34495E",
+    Netmon::Connection::STATE_FIN_WAIT2   => "#34495E",
+    Netmon::Connection::STATE_CLOSING     => "#34495E",
+    Netmon::Connection::STATE_CLOSE_WAIT  => "#34495E",
+    Netmon::Connection::STATE_LAST_ACK    => "#34495E",
+    Netmon::Connection::STATE_TIME_WAIT   => "#BDC3C7",
+    Netmon::Connection::STATE_CLOSE       => "#95A5A6"
+  }
+  # rubocop:enable Layout
 
   class Store
     DataItem = Struct.new(:keyitem)
@@ -148,6 +180,8 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
       @active_processes.add(comm)
       @active_users.add(conn.uname)
+
+      refresh_updateitem_color(keyitem.index, conn.protocol, conn.state)
     end
 
     def refresh_updateitem(dataitem, conn)
@@ -163,6 +197,15 @@ class ConnsTableView < RubyQt6::Bando::QWidget
         item = @itemmodel.item_from_index(keyitemindex.sibling_at_column(column))
         item.set_text(text)
       end
+
+      refresh_updateitem_color(keyitemindex, conn.protocol, conn.state)
+    end
+
+    def refresh_updateitem_color(keyitemindex, protocol, state)
+      colors = protocol.include?("TCP") ? COLORS_TCP_STATE : COLORS_UDP_STATE
+      color = QBrush.new(QColor.new(colors[state]))
+      item = @itemmodel.item_from_index(keyitemindex.sibling_at_column(COLUMN_STATE))
+      item.set_foreground(color)
     end
   end
 end
