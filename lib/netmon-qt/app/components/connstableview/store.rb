@@ -74,28 +74,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
       conns.each do |key, conn|
         dataitem = @dataitems[key]
-        next unless dataitem.nil?
-
-        keyitem = initialize_standarditem(key)
-        @dataitems[key] = DataItem.new(keyitem)
-
-        pname = conn.comm.nil? ? "?" : conn.comm
-        pid = conn.pid.nil? ? "?" : conn.pid.to_s
-        @itemmodel.append_row(
-          keyitem,
-          initialize_standarditem(initialize_icon_process(pname), pname),
-          initialize_standarditem(pid),
-          initialize_standarditem(conn.protocol),
-          initialize_standarditem(conn.state),
-          initialize_standarditem(conn.uname),
-          initialize_standarditem(initialize_icon_ipaddress(conn.local_address), conn.local_address),
-          initialize_standarditem(conn.local_port.to_s),
-          initialize_standarditem(initialize_icon_ipaddress(conn.remote_address), conn.remote_address),
-          initialize_standarditem(conn.remote_port.to_s)
-        )
-
-        @active_processes.add(pname)
-        @active_users.add(conn.uname)
+        dataitem.nil? ? refresh_additem(key, conn) : refresh_updateitem(dataitem, conn)
       end
     end
 
@@ -107,18 +86,19 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       item
     end
 
-    def initialize_icon_process(pname)
-      name =
-        case pname
+    def initialize_icon_process(comm)
+      icon =
+        case comm
         when "adb" then "android-file-transfer"
         when "fcitx5" then "fcitx"
         when "kdeconnectd" then "kdeconnect"
         when "msedge" then "microsoft-edge"
         when "ssh" then "terminal"
-        when "?" then "question"
-        else pname
+        when Netmon::Connection::COMM_DEFUNCT then "error"
+        when Netmon::Connection::COMM_UNKNOWN then "question"
+        else comm
         end
-      QIcon.from_theme(name)
+      QIcon.from_theme(icon)
     end
 
     def initialize_icon_ipaddress(ipaddress)
@@ -143,6 +123,43 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       pixmap = QPixmap.new(36, 36)
       pixmap.fill(QColor.new(Qt::White))
       QIcon.new(pixmap)
+    end
+
+    def refresh_additem(key, conn)
+      keyitem = initialize_standarditem(key)
+      @dataitems[key] = DataItem.new(keyitem)
+
+      comm = conn.comm_text
+      @itemmodel.append_row(
+        keyitem,
+        initialize_standarditem(initialize_icon_process(comm), comm),
+        initialize_standarditem(conn.pid_text),
+        initialize_standarditem(conn.protocol),
+        initialize_standarditem(conn.state),
+        initialize_standarditem(conn.uname),
+        initialize_standarditem(initialize_icon_ipaddress(conn.local_address), conn.local_address),
+        initialize_standarditem(conn.local_port.to_s),
+        initialize_standarditem(initialize_icon_ipaddress(conn.remote_address), conn.remote_address),
+        initialize_standarditem(conn.remote_port.to_s)
+      )
+
+      @active_processes.add(comm)
+      @active_users.add(conn.uname)
+    end
+
+    def refresh_updateitem(dataitem, conn)
+      keyitem = dataitem.keyitem
+      keyitemindex = keyitem.index
+
+      {
+        COLUMN_PROCESS_NAME => conn.comm_text,
+        COLUMN_PROCESS_ID => conn.pid_text,
+        COLUMN_STATE => conn.state,
+        COLUMN_USER => conn.uname
+      }.each do |column, text|
+        item = @itemmodel.item_from_index(keyitemindex.sibling_at_column(column))
+        item.set_text(text)
+      end
     end
   end
 end

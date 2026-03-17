@@ -3,6 +3,7 @@ require_relative "connstableview/store"
 
 class ConnsTableView < RubyQt6::Bando::QWidget
   q_object do
+    slot "_on_endprocess_action_triggered()"
     slot "_on_whois_action_triggered()"
     slot "_on_copy_action_triggered()"
     slot "_on_autorefresh_timer_timeout()"
@@ -35,8 +36,9 @@ class ConnsTableView < RubyQt6::Bando::QWidget
   private
 
   def initialize_actions
-    @whois_action = initialize_actions_act(QIcon::ThemeIcon::EditFind, "Whois", :_on_whois_action_triggered)
-    @copy_action = initialize_actions_act(QIcon::ThemeIcon::EditCopy, "Copy Current Column", :_on_copy_action_triggered)
+    @endprocess_action = initialize_actions_act(QIcon::ThemeIcon::ApplicationExit, "End Process", :_on_endprocess_action_triggered)
+    @whois_action = initialize_actions_act(QIcon::ThemeIcon::EditFind, "", :_on_whois_action_triggered)
+    @copy_action = initialize_actions_act(QIcon::ThemeIcon::EditCopy, "", :_on_copy_action_triggered)
   end
 
   def initialize_actions_act(icon, text, slot)
@@ -136,19 +138,26 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     end
   end
 
+  def _on_endprocess_action_triggered
+    return unless @lastindex.valid?
+
+    pid = @lastindex.sibling_at_column(COLUMN_PROCESS_ID).data.value
+    QProcess.execute("kill", QStringList.new << "-9" << pid)
+  end
+
   def _on_whois_action_triggered
     return unless @lastindex.valid?
 
-    value = @lastindex.sibling_at_column(COLUMN_REMOTE_ADDRESS).data.value
-    url = QUrl.new("https://ipinfo.io/#{value}")
+    remote_address = @lastindex.sibling_at_column(COLUMN_REMOTE_ADDRESS).data.value
+    url = QUrl.new("https://ipinfo.io/#{remote_address}")
     QDesktopServices.open_url(url)
   end
 
   def _on_copy_action_triggered
     return unless @lastindex.valid?
 
-    value = @lastindex.data.value
-    QApplication.clipboard.set_text(value)
+    text = @lastindex.data.value
+    QApplication.clipboard.set_text(text)
   end
 
   def _on_autorefresh_timer_timeout
@@ -176,12 +185,16 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     menu = QMenu.new("", self)
     menu.set_attribute(Qt::WA_DeleteOnClose)
 
+    pid = @lastindex.sibling_at_column(COLUMN_PROCESS_ID).data.value.to_s
     remote_address = @lastindex.sibling_at_column(COLUMN_REMOTE_ADDRESS).data.value.to_s
     remote_address = remote_address.include?(".") ? remote_address : remote_address[..11] + "..."
 
+    @endprocess_action.set_enabled(pid.to_i.nonzero?)
     @whois_action.set_text("Whois #{remote_address} - via IPinfo")
     @copy_action.set_text("Copy \"#{@lastindex.data.value}\"")
 
+    menu.add_action(@endprocess_action)
+    menu.add_separator
     menu.add_action(@whois_action)
     menu.add_action(@copy_action)
 
