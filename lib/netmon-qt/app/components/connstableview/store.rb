@@ -13,7 +13,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
   COLUMN_REMOTE_ADDRESS = 8
   COLUMN_REMOTE_PORT    = 9
 
-  # Traffic Light Color Palette
+  # TCP: Use Traffic Light Color Palette
   COLORS_TCP_STATE = {
     Netmon::Connection::STATE_ESTABLISHED => "#27AE60",
     Netmon::Connection::STATE_LISTEN      => "#2980B9",
@@ -28,7 +28,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     Netmon::Connection::STATE_CLOSE       => "#C0392B"
   }
 
-  # Blue To Cyan Color Palette
+  # UDP: Use Blue To Cyan Color Palette
   COLORS_UDP_STATE = {
     Netmon::Connection::STATE_ESTABLISHED => "#1ABC9C",
     Netmon::Connection::STATE_LISTEN      => "#3498DB",
@@ -50,9 +50,10 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     attr_reader :itemmodel
 
     def initialize(parent)
-      @geoiolookup = MaxMind::DB.new(
-        GEOLITE2_MMDB, mode: MaxMind::DB::MODE_MEMORY
-      )
+      @geoiolookup = begin
+        MaxMind::DB.new(GEOLITE2_MMDB, mode: MaxMind::DB::MODE_MEMORY)
+      rescue Errno::ENOENT
+      end
 
       @active_processes = Set.new
       @active_protocols = Set.new
