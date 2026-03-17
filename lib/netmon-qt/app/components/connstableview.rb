@@ -186,8 +186,8 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     menu.set_attribute(Qt::WA_DeleteOnClose)
 
     pid = @lastindex.sibling_at_column(COLUMN_PROCESS_ID).data.value.to_s
-    remote_address = @lastindex.sibling_at_column(COLUMN_REMOTE_ADDRESS).data.value.to_s
-    remote_address = remote_address.include?(".") ? remote_address : remote_address[..11] + "..."
+    remote_address = @lastindex.sibling_at_column(COLUMN_REMOTE_ADDRESS).data.value
+    remote_address = remote_address.contains(".") ? remote_address : "#{remote_address[0, 12]}..."
 
     @endprocess_action.set_enabled(pid.to_i.nonzero?)
     @whois_action.set_text("Whois #{remote_address} - via IPinfo")

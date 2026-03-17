@@ -1,5 +1,7 @@
 module Netmon
   class Connection
+    PROTOCOL_TCP = "TCP"
+    PROTOCOL_UDP = "UDP"
     PROTOCOL_TCP4 = "TCP v4"
     PROTOCOL_TCP6 = "TCP v6"
     PROTOCOL_UDP4 = "UDP v4"

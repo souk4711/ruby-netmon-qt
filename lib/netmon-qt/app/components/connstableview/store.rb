@@ -24,10 +24,13 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
       @active_processes = Set.new
       @active_protocols = Set.new
+        .add(Netmon::Connection::PROTOCOL_TCP)
+        .add(Netmon::Connection::PROTOCOL_UDP)
         .add(Netmon::Connection::PROTOCOL_TCP4)
         .add(Netmon::Connection::PROTOCOL_TCP6)
         .add(Netmon::Connection::PROTOCOL_UDP4)
         .add(Netmon::Connection::PROTOCOL_UDP6)
+        .freeze
       @active_users = Set.new
         .add(Etc.getpwuid.name)
 
@@ -55,7 +58,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     end
 
     def active_protocols
-      @active_protocols.sort
+      @active_protocols.to_a
     end
 
     def active_users

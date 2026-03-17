@@ -11,6 +11,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
         value = source_model.data(source_model.index(source_row, column)).value
         next if filter_value == value
+        next if column == COLUMN_PROTOCOL && value.starts_with(filter_value)
 
         return false
       end
