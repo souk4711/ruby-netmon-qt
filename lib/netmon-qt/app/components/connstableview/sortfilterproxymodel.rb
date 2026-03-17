@@ -21,19 +21,47 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     end
 
     def less_than(lhs, rhs)
-      if lhs.column == COLUMN_LOCAL_ADDRESS || lhs.column == COLUMN_REMOTE_ADDRESS
-        lhs_data = IPAddr.new(source_model.data(lhs).value.to_s)
-        rhs_data = IPAddr.new(source_model.data(rhs).value.to_s)
-        return false if lhs_data.ipv6? && rhs_data.ipv4?
-        return true if lhs_data.ipv4? && rhs_data.ipv6?
-        super
-      elsif lhs.column == COLUMN_LOCAL_PORT || lhs.column == COLUMN_REMOTE_PORT
-        lhs_data = source_model.data(lhs).value.to_s.to_i
-        rhs_data = source_model.data(rhs).value.to_s.to_i
-        lhs_data < rhs_data
+      case lhs.column
+      when COLUMN_PROCESS_NAME
+        less_than_process_name(lhs, rhs)
+      when COLUMN_LOCAL_ADDRESS, COLUMN_REMOTE_ADDRESS
+        less_than_column_address(lhs, rhs)
+      when COLUMN_PROCESS_ID, COLUMN_LOCAL_PORT, COLUMN_REMOTE_PORT
+        less_than_column_numeric(lhs, rhs)
       else
         super
       end
+    end
+
+    private
+
+    def less_than_process_name(lhs, rhs)
+      lhs_data = source_model.data(lhs).value
+      rhs_data = source_model.data(rhs).value
+      case lhs_data <=> rhs_data
+      when +0
+        lhs = source_model.index(lhs.row, COLUMN_STATE)
+        rhs = source_model.index(rhs.row, COLUMN_STATE)
+        less_than(lhs, rhs)
+      when +1
+        false
+      when -1
+        true
+      end
+    end
+
+    def less_than_column_address(lhs, rhs)
+      lhs_data = IPAddr.new(source_model.data(lhs).value.to_s)
+      rhs_data = IPAddr.new(source_model.data(rhs).value.to_s)
+      return false if lhs_data.ipv6? && rhs_data.ipv4?
+      return true if lhs_data.ipv4? && rhs_data.ipv6?
+      lhs_data < rhs_data
+    end
+
+    def less_than_column_numeric(lhs, rhs)
+      lhs_data = source_model.data(lhs).value.to_s.to_i
+      rhs_data = source_model.data(rhs).value.to_s.to_i
+      lhs_data < rhs_data
     end
   end
 end

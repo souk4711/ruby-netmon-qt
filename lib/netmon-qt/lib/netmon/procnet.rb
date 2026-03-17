@@ -1,17 +1,17 @@
 module Netmon
   module ProcNet
     TCP_STATE = {
-      "01" => "ESTABLISHED",
-      "02" => "SYN_SENT",
-      "03" => "SYN_RECV",
-      "04" => "FIN_WAIT1",
-      "05" => "FIN_WAIT2",
-      "06" => "TIME_WAIT",
-      "07" => "CLOSE",
-      "08" => "CLOSE_WAIT",
-      "09" => "LAST_ACK",
-      "0A" => "LISTEN",
-      "0B" => "CLOSING"
+      "01" => Connection::STATE_ESTABLISHED,
+      "02" => Connection::STATE_SYN_SENT,
+      "03" => Connection::STATE_SYN_RECV,
+      "04" => Connection::STATE_FIN_WAIT1,
+      "05" => Connection::STATE_FIN_WAIT2,
+      "06" => Connection::STATE_TIME_WAIT,
+      "07" => Connection::STATE_CLOSE,
+      "08" => Connection::STATE_CLOSE_WAIT,
+      "09" => Connection::STATE_LAST_ACK,
+      "0A" => Connection::STATE_LISTEN,
+      "0B" => Connection::STATE_CLOSING
     }.freeze
 
     def self.sockets_form_str(str)

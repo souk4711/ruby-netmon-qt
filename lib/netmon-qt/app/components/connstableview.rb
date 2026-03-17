@@ -173,6 +173,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
     update_filter_additem(@processfilter, @store.active_processes)
     update_filter_additem(@userfilter, @store.active_users)
+    _on_filter_changed
   end
 
   def _on_autorefreshbtn_changed(state)

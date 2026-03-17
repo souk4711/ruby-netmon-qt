@@ -65,7 +65,6 @@ class ConnsTableView < RubyQt6::Bando::QWidget
         .add(Netmon::Connection::PROTOCOL_UDP6)
         .freeze
       @active_states = Set.new
-        .add(Netmon::Connection::STATE_CLOSE)
         .add(Netmon::Connection::STATE_ESTABLISHED)
         .add(Netmon::Connection::STATE_LISTEN)
         .add(Netmon::Connection::STATE_SYN_SENT)
