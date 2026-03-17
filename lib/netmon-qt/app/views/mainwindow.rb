@@ -6,6 +6,7 @@ class MainWindow < RubyQt6::Bando::QMainWindow
     super
 
     initialize_central_widget
+    initialize_statusbar
 
     set_context_menu_policy(Qt::NoContextMenu)
     NetmonQt.settings.GET_mainwindow_geometry_and_restore_to(self)
@@ -27,5 +28,12 @@ class MainWindow < RubyQt6::Bando::QMainWindow
     mainlayout.add_widget(@connstableview)
 
     set_central_widget(centralwidget)
+  end
+
+  def initialize_statusbar
+    statusbar = QStatusBar.new
+    statusbar.add_permanent_widget(@connstableview.statusbar, 1)
+
+    set_status_bar(statusbar)
   end
 end

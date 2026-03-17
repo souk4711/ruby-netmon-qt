@@ -1,4 +1,5 @@
 require_relative "connstableview/sortfilterproxymodel"
+require_relative "connstableview/statusbar"
 require_relative "connstableview/store"
 
 class ConnsTableView < RubyQt6::Bando::QWidget
@@ -13,6 +14,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
   end
 
   attr_reader :processfilter, :protocolfilter, :statefilter, :userfilter
+  attr_reader :statusbar
 
   def initialize
     super
@@ -30,6 +32,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     mainlayout.add_widget(@toolbar)
     mainlayout.add_widget(@tableview)
 
+    _on_filter_changed
     @autorefreshbtn.set_check_state(Qt::Checked)
   end
 
@@ -124,6 +127,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
   end
 
   def initialize_statusbar
+    @statusbar = StatusBar.new(@storeproxymodel)
   end
 
   def initialize_timer_autorefresh
@@ -147,6 +151,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
   def _on_filter_changed
     @storeproxymodel.invalidate
+    @statusbar.refresh
   end
 
   def _on_autorefreshbtn_changed(state)
