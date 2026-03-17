@@ -52,7 +52,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     def initialize(parent)
       @geoiolookup = begin
         MaxMind::DB.new(GEOLITE2_MMDB, mode: MaxMind::DB::MODE_MEMORY)
-      rescue Errno::ENOENT
+      rescue Errno::EACCES, Errno::ENOENT
       end
 
       @active_processes = Set.new
@@ -121,13 +121,12 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
       removed = @dataitems.keys - conns.keys
       removed.each do |key|
-        dataitem = @dataitems.delete(key)
-        @itemmodel.remove_row(dataitem.keyitem.row)
+        update_itemmodel_removeitem(key)
       end
 
       conns.each do |key, conn|
         dataitem = @dataitems[key]
-        dataitem.nil? ? refresh_additem(key, conn) : refresh_updateitem(dataitem, conn)
+        dataitem.nil? ? update_itemmodel_additem(key, conn) : update_itemmodel_updateitem(dataitem, conn)
       end
     end
 
@@ -178,7 +177,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       QIcon.new(pixmap)
     end
 
-    def refresh_additem(key, conn)
+    def update_itemmodel_additem(key, conn)
       keyitem = initialize_standarditem(key)
       @dataitems[key] = DataItem.new(keyitem)
 
@@ -199,10 +198,19 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       @active_processes.add(comm)
       @active_users.add(conn.uname)
 
-      refresh_updateitem_color(keyitem.index, conn.protocol, conn.state)
+      update_itemmodel_updateitemcolor(
+        keyitem.index,
+        conn.protocol,
+        conn.state
+      )
     end
 
-    def refresh_updateitem(dataitem, conn)
+    def update_itemmodel_removeitem(key)
+      dataitem = @dataitems.delete(key)
+      @itemmodel.remove_row(dataitem.keyitem.row)
+    end
+
+    def update_itemmodel_updateitem(dataitem, conn)
       keyitem = dataitem.keyitem
       keyitemindex = keyitem.index
 
@@ -215,10 +223,14 @@ class ConnsTableView < RubyQt6::Bando::QWidget
         item.set_text(text)
       end
 
-      refresh_updateitem_color(keyitemindex, conn.protocol, conn.state)
+      update_itemmodel_updateitemcolor(
+        keyitemindex,
+        conn.protocol,
+        conn.state
+      )
     end
 
-    def refresh_updateitem_color(keyitemindex, protocol, state)
+    def update_itemmodel_updateitemcolor(keyitemindex, protocol, state)
       colors = protocol.include?("TCP") ? COLORS_TCP_STATE : COLORS_UDP_STATE
       color = QBrush.new(QColor.new(colors[state]))
       item = @itemmodel.item_from_index(keyitemindex.sibling_at_column(COLUMN_STATE))

@@ -3,13 +3,13 @@ require_relative "connstableview/store"
 
 class ConnsTableView < RubyQt6::Bando::QWidget
   q_object do
+    slot "_on_filter_changed()"
+    slot "_on_autorefreshbtn_changed(Qt::CheckState)"
+    slot "_on_autorefresh_timer_timeout()"
+    slot "_on_tableview_custom_context_menu_requested(QPoint)"
     slot "_on_endprocess_action_triggered()"
     slot "_on_whois_action_triggered()"
     slot "_on_copy_action_triggered()"
-    slot "_on_autorefresh_timer_timeout()"
-    slot "_on_autorefreshbtn_changed(Qt::CheckState)"
-    slot "_on_filter_changed()"
-    slot "_on_tableview_custom_context_menu_requested(QPoint)"
   end
 
   attr_reader :processfilter, :protocolfilter, :statefilter, :userfilter
@@ -19,10 +19,11 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
     @lastindex = nil
 
-    initialize_actions
     initialize_store
+    initialize_actions
     initialize_toolbar
     initialize_tableview
+    initialize_statusbar
     initialize_timer_autorefresh
 
     mainlayout = QVBoxLayout.new(self)
@@ -34,6 +35,10 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
   private
 
+  def initialize_store
+    @store = Store.new(self)
+  end
+
   def initialize_actions
     @endprocess_action = initialize_actions_act(QIcon::ThemeIcon::ApplicationExit, "End Process", :_on_endprocess_action_triggered)
     @whois_action = initialize_actions_act(QIcon::ThemeIcon::EditFind, "", :_on_whois_action_triggered)
@@ -44,10 +49,6 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     action = QAction.new(QIcon.from_theme(icon), text, self)
     action.triggered.connect(self, slot)
     action
-  end
-
-  def initialize_store
-    @store = Store.new(self)
   end
 
   def initialize_toolbar
@@ -122,6 +123,9 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     @tableview.set_sorting_enabled(true)
   end
 
+  def initialize_statusbar
+  end
+
   def initialize_timer_autorefresh
     @timer = QTimer.new(self)
     @timer.set_interval(4_000)
@@ -133,47 +137,16 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     items.reverse_each do |item|
       loop do
         case filter.item_text(index) <=> item
-        when +0
-          break
-        when +1
-          index -= 1
-          next
-        when -1
-          filter.insert_item(index + 1, item)
-          break
+        when +0 then break
+        when +1 then (index -= 1) || next
+        when -1 then filter.insert_item(index + 1, item) || break
         end
       end
     end
   end
 
-  def _on_endprocess_action_triggered
-    return unless @lastindex.valid?
-
-    pid = @lastindex.sibling_at_column(COLUMN_PROCESS_ID).data.value
-    QProcess.execute("kill", QStringList.new << "-9" << pid)
-  end
-
-  def _on_whois_action_triggered
-    return unless @lastindex.valid?
-
-    remote_address = @lastindex.sibling_at_column(COLUMN_REMOTE_ADDRESS).data.value
-    url = QUrl.new("https://ipinfo.io/#{remote_address}")
-    QDesktopServices.open_url(url)
-  end
-
-  def _on_copy_action_triggered
-    return unless @lastindex.valid?
-
-    text = @lastindex.data.value
-    QApplication.clipboard.set_text(text)
-  end
-
-  def _on_autorefresh_timer_timeout
-    @store.refresh
-
-    update_filter_additem(@processfilter, @store.active_processes)
-    update_filter_additem(@userfilter, @store.active_users)
-    _on_filter_changed
+  def _on_filter_changed
+    @storeproxymodel.invalidate
   end
 
   def _on_autorefreshbtn_changed(state)
@@ -183,8 +156,12 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     end
   end
 
-  def _on_filter_changed
-    @storeproxymodel.invalidate
+  def _on_autorefresh_timer_timeout
+    @store.refresh
+
+    update_filter_additem(@processfilter, @store.active_processes)
+    update_filter_additem(@userfilter, @store.active_users)
+    _on_filter_changed
   end
 
   def _on_tableview_custom_context_menu_requested(position)
@@ -208,5 +185,27 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     menu.add_action(@copy_action)
 
     menu.exec(@tableview.viewport.map_to_global(position))
+  end
+
+  def _on_endprocess_action_triggered
+    return unless @lastindex.valid?
+
+    pid = @lastindex.sibling_at_column(COLUMN_PROCESS_ID).data.value
+    QProcess.execute("kill", QStringList.new << "-9" << pid)
+  end
+
+  def _on_whois_action_triggered
+    return unless @lastindex.valid?
+
+    remote_address = @lastindex.sibling_at_column(COLUMN_REMOTE_ADDRESS).data.value
+    url = QUrl.new("https://ipinfo.io/#{remote_address}")
+    QDesktopServices.open_url(url)
+  end
+
+  def _on_copy_action_triggered
+    return unless @lastindex.valid?
+
+    text = @lastindex.data.value
+    QApplication.clipboard.set_text(text)
   end
 end

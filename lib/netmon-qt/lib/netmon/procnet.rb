@@ -39,9 +39,11 @@ module Netmon
       else raise "Invalid address str: #{str}"
       end
     end
+    private_class_method :format_address
 
     def self.format_port(str)
       str.to_i(16)
     end
+    private_class_method :format_port
   end
 end

@@ -27,6 +27,8 @@ class ConnsLookupService
     conns
   end
 
+  private
+
   def conn_protocol(str)
     case str
     when "tcp"
