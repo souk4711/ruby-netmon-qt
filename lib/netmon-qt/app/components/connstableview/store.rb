@@ -93,12 +93,12 @@ class ConnsTableView < RubyQt6::Bando::QWidget
         when "fcitx5" then "fcitx"
         when "kdeconnectd" then "kdeconnect"
         when "msedge" then "microsoft-edge"
-        when "ssh" then "terminal"
         when Netmon::Connection::COMM_DEFUNCT then "error"
         when Netmon::Connection::COMM_UNKNOWN then "question"
         else comm
         end
-      QIcon.from_theme(icon)
+      icon = QIcon.from_theme(icon)
+      icon.null? ? QIcon.from_theme("terminal") : icon
     end
 
     def initialize_icon_ipaddress(ipaddress)
@@ -108,18 +108,18 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       return QIcon.from_theme(QIcon::ThemeIcon::Computer) if islocal
 
       record = @geoiolookup.get(ipaddress)
-      return initialize_icon_ipaddress_unknown if record.nil?
+      return QIcon.from_theme("question") if record.nil?
 
       code = record.dig("country", "iso_code")&.downcase
-      return initialize_icon_ipaddress_unknown if code.nil?
+      return QIcon.from_theme("question") if code.nil?
 
       file = "assets:/flags/#{code}.svg"
-      return initialize_icon_ipaddress_unknown unless QFile.exists(file)
+      return initialize_icon_non_existent unless QFile.exists(file)
 
       QIcon.new(file)
     end
 
-    def initialize_icon_ipaddress_unknown
+    def initialize_icon_non_existent
       pixmap = QPixmap.new(36, 36)
       pixmap.fill(QColor.new(Qt::White))
       QIcon.new(pixmap)
