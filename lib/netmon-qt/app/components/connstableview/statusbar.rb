@@ -13,6 +13,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       mainlayout.add_widget(@listening_label)
       mainlayout.add_widget(@time_wait_label)
       mainlayout.add_stretch
+      mainlayout.add_widget(@check_internal_label)
     end
 
     def refresh
@@ -44,12 +45,23 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       @established_label = initialize_label("", COLORS_TCP_STATE[Netmon::Connection::STATE_ESTABLISHED])
       @listening_label = initialize_label("", COLORS_TCP_STATE[Netmon::Connection::STATE_LISTEN])
       @time_wait_label = initialize_label("", COLORS_TCP_STATE[Netmon::Connection::STATE_TIME_WAIT])
+
+      value = NetmonQt.settings.GET_connections_check_interval / 1_000
+      @check_internal_label = initialize_check_internal_label("Refresh Internal: #{value} sec", "#000000")
     end
 
     def initialize_label(text, color)
       label = QLabel.new(text)
       label.set_fixed_width(128)
       label.set_style_sheet("color: #{color};")
+      label
+    end
+
+    def initialize_check_internal_label(text, color)
+      label = QLabel.new(text)
+      label.set_fixed_width(192)
+      label.set_style_sheet("color: #{color};")
+      label.set_alignment(Qt::AlignRight | Qt::AlignVCenter)
       label
     end
   end

@@ -93,8 +93,6 @@ class ConnsTableView < RubyQt6::Bando::QWidget
           .push("Remote Address")
           .push("Remote Port")
       )
-
-      refresh
     end
 
     def active_processes

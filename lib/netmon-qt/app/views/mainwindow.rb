@@ -32,6 +32,7 @@ class MainWindow < RubyQt6::Bando::QMainWindow
 
   def initialize_statusbar
     statusbar = QStatusBar.new
+    statusbar.set_contents_margins(12, 0, 12, 0)
     statusbar.add_permanent_widget(@connstableview.statusbar, 1)
 
     set_status_bar(statusbar)

@@ -3,9 +3,25 @@ require_relative "connstableview/statusbar"
 require_relative "connstableview/store"
 
 class ConnsTableView < RubyQt6::Bando::QWidget
+  QSS_BUTTON_AUTOREFRESH = "
+    QPushButton {
+      background: #EFF0F1;
+      color: #7F8C8D;
+      border: 1px solid #BCBEBF;
+      border-bottom: 3px solid #B0B0B0;
+      border-radius: 3px;
+      padding: 6px;
+      font-weight: bold;
+    }
+    QPushButton:checked {
+      background: #FFFFFF;
+      color: #31363B;
+    }
+  "
+
   q_object do
     slot "_on_filter_changed()"
-    slot "_on_autorefreshbtn_changed(Qt::CheckState)"
+    slot "_on_autorefreshbtn_toggled(bool)"
     slot "_on_autorefresh_timer_timeout()"
     slot "_on_tableview_custom_context_menu_requested(QPoint)"
     slot "_on_endprocess_action_triggered()"
@@ -32,8 +48,8 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     mainlayout.add_widget(@toolbar)
     mainlayout.add_widget(@tableview)
 
-    _on_filter_changed
-    @autorefreshbtn.set_check_state(Qt::Checked)
+    @userfilter.set_current_text(Etc.getpwuid.name)
+    @autorefreshbtn.set_checked(true)
   end
 
   private
@@ -79,8 +95,11 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     @store.active_users.each { |user| @userfilter.add_item(user) }
     @userfilter.current_text_changed.connect(self, :_on_filter_changed)
 
-    @autorefreshbtn = QCheckBox.new("Auto Refresh")
-    @autorefreshbtn.check_state_changed.connect(self, :_on_autorefreshbtn_changed)
+    @autorefreshbtn = QPushButton.new("")
+    @autorefreshbtn.set_fixed_width(192)
+    @autorefreshbtn.set_style_sheet(QSS_BUTTON_AUTOREFRESH)
+    @autorefreshbtn.set_checkable(true)
+    @autorefreshbtn.toggled.connect(self, :_on_autorefreshbtn_toggled)
 
     @toolbar = QWidget.new
     @toolbarlayout = QHBoxLayout.new(@toolbar)
@@ -118,7 +137,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
     @tableview.horizontal_header.hide_section(0)
     @tableview.vertical_header.set_visible(false)
-    @tableview.resize_column_to_contents(COLUMN_PROCESS_NAME)
+    @tableview.set_column_width(COLUMN_PROCESS_NAME, 128)
     @tableview.set_column_width(COLUMN_LOCAL_ADDRESS, 192)
     @tableview.set_column_width(COLUMN_REMOTE_ADDRESS, 192)
 
@@ -154,10 +173,14 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     @statusbar.refresh
   end
 
-  def _on_autorefreshbtn_changed(state)
-    case state
-    when Qt::Checked then @timer.start
-    when Qt::Unchecked then @timer.stop
+  def _on_autorefreshbtn_toggled(checked)
+    if checked
+      @autorefreshbtn.set_text("Auto Refresh:  ON")
+      @timer.start
+      _on_autorefresh_timer_timeout
+    else
+      @autorefreshbtn.set_text("Auto Refresh: OFF")
+      @timer.stop
     end
   end
 
