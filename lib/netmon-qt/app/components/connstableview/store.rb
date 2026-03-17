@@ -63,6 +63,20 @@ class ConnsTableView < RubyQt6::Bando::QWidget
         .add(Netmon::Connection::PROTOCOL_UDP4)
         .add(Netmon::Connection::PROTOCOL_UDP6)
         .freeze
+      @active_states = Set.new
+        .add(Netmon::Connection::STATE_CLOSE)
+        .add(Netmon::Connection::STATE_ESTABLISHED)
+        .add(Netmon::Connection::STATE_LISTEN)
+        .add(Netmon::Connection::STATE_SYN_SENT)
+        .add(Netmon::Connection::STATE_SYN_RECV)
+        .add(Netmon::Connection::STATE_FIN_WAIT1)
+        .add(Netmon::Connection::STATE_FIN_WAIT2)
+        .add(Netmon::Connection::STATE_CLOSING)
+        .add(Netmon::Connection::STATE_CLOSE_WAIT)
+        .add(Netmon::Connection::STATE_LAST_ACK)
+        .add(Netmon::Connection::STATE_TIME_WAIT)
+        .add(Netmon::Connection::STATE_CLOSE)
+        .freeze
       @active_users = Set.new
         .add(Etc.getpwuid.name)
 
@@ -91,6 +105,10 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
     def active_protocols
       @active_protocols.to_a
+    end
+
+    def active_states
+      @active_states.to_a
     end
 
     def active_users

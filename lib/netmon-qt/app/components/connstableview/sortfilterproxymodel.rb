@@ -4,6 +4,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       {
         COLUMN_PROCESS_NAME => parent.processfilter,
         COLUMN_PROTOCOL => parent.protocolfilter,
+        COLUMN_STATE => parent.statefilter,
         COLUMN_USER => parent.userfilter
       }.each do |column, filter|
         filter_value = filter.current_text

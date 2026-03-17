@@ -12,7 +12,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     slot "_on_tableview_custom_context_menu_requested(QPoint)"
   end
 
-  attr_reader :processfilter, :protocolfilter, :userfilter
+  attr_reader :processfilter, :protocolfilter, :statefilter, :userfilter
 
   def initialize
     super
@@ -63,6 +63,12 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     @protocolfilter.set_fixed_width(128)
     @protocolfilter.current_text_changed.connect(self, :_on_filter_changed)
 
+    @statefilter = QComboBox.new
+    @statefilter.add_item("*")
+    @store.active_states.each { |state| @statefilter.add_item(state) }
+    @statefilter.set_fixed_width(128)
+    @statefilter.current_text_changed.connect(self, :_on_filter_changed)
+
     @userfilter = QComboBox.new
     @userfilter.set_fixed_width(128)
     @userfilter.add_item("*")
@@ -79,6 +85,9 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     @toolbarlayout.add_spacing(8)
     @toolbarlayout.add_widget(initialize_toolbar_label("Protocol:"))
     @toolbarlayout.add_widget(@protocolfilter)
+    @toolbarlayout.add_spacing(8)
+    @toolbarlayout.add_widget(initialize_toolbar_label("State:"))
+    @toolbarlayout.add_widget(@statefilter)
     @toolbarlayout.add_spacing(8)
     @toolbarlayout.add_widget(initialize_toolbar_label("User:"))
     @toolbarlayout.add_widget(@userfilter)
