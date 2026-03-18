@@ -9,16 +9,16 @@ A simple network monitor on Linux.
 
 ## Installation
 
-```console
-$ gem install ruby-netmon-qt
+```sh
+gem install ruby-netmon-qt
 ```
 
 ## Usage
 
 To launch the GUI:
 
-```console
-$ netmon-qt
+```sh
+netmon-qt
 ```
 
 ## License
