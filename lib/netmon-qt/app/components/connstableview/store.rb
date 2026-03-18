@@ -168,7 +168,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     end
 
     def initialize_icon_non_existent
-      pixmap = QPixmap.new(36, 36)
+      pixmap = QPixmap.new(64, 64)
       pixmap.fill(QColor.new(Qt::White))
       QIcon.new(pixmap)
     end
