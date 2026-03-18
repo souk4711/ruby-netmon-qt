@@ -21,6 +21,10 @@ To launch the GUI:
 netmon-qt
 ```
 
+## Screenshot
+
+![screenshot](https://github.com/souk4711/ruby-netmon-qt/raw/main/misc/screenshots/mainwindow.png)
+
 ## License
 
 Licensed under the [GPL-3.0-only](./LICENSE).
