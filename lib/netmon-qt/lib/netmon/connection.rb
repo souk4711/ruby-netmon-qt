@@ -54,5 +54,15 @@ module Netmon
       return comm if comm
       inode.zero? ? COMM_DEFUNCT : COMM_UNKNOWN
     end
+
+    def since_text
+      return "" if created_at.nil?
+
+      m, s = (Time.now - created_at).to_i.divmod(60)
+      h, m = m.divmod(60)
+      d, h = h.divmod(24)
+      units = {"d" => d, "h" => h, "m" => m, "s" => s}
+      units.map { |unit, value| value.zero? ? nil : "#{value}#{unit}" }.compact.join(" ")
+    end
   end
 end

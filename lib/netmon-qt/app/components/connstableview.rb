@@ -140,6 +140,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     @tableview.set_column_width(COLUMN_PROCESS_NAME, 128)
     @tableview.set_column_width(COLUMN_LOCAL_ADDRESS, 192)
     @tableview.set_column_width(COLUMN_REMOTE_ADDRESS, 192)
+    @tableview.set_column_width(COLUMN_SINCE, 128)
 
     @tableview.sort_by_column(COLUMN_PROCESS_NAME, Qt::AscendingOrder)
     @tableview.set_sorting_enabled(true)

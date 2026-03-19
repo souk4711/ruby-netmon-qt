@@ -191,7 +191,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
         initialize_standarditem(conn.local_port.to_s),
         initialize_standarditem(initialize_icon_ipaddress(conn.remote_address), conn.remote_address),
         initialize_standarditem(conn.remote_port.to_s),
-        initialize_standarditem(conn.created_at.to_s)
+        initialize_standarditem(conn.since_text)
       )
 
       @active_processes.add(comm)
@@ -216,7 +216,8 @@ class ConnsTableView < RubyQt6::Bando::QWidget
       {
         COLUMN_PROCESS_ID => conn.pid_text,
         COLUMN_STATE => conn.state,
-        COLUMN_USER => conn.uname
+        COLUMN_USER => conn.uname,
+        COLUMN_SINCE => conn.since_text
       }.each do |column, text|
         item = @itemmodel.item_from_index(keyitemindex.sibling_at_column(column))
         item.set_text(text)
