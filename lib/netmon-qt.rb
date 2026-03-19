@@ -1,4 +1,5 @@
 require "etc"
+require "ipaddr"
 
 require "maxmind/db"
 require "qt6/qtwidgets"

@@ -29,6 +29,7 @@ module Netmon
     attr_accessor :remote_address, :remote_port
     attr_accessor :state, :uid, :inode
     attr_accessor :pid, :comm
+    attr_accessor :created_at
 
     def initialize(attrs)
       attrs.each do |attr, value|

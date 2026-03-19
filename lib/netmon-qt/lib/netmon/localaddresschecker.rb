@@ -1,5 +1,3 @@
-require "ipaddr"
-
 module Netmon
   module LocalAddressChecker
     CIDR_LIST = [

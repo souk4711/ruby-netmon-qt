@@ -10,6 +10,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
   COLUMN_LOCAL_PORT     = 7
   COLUMN_REMOTE_ADDRESS = 8
   COLUMN_REMOTE_PORT    = 9
+  COLUMN_SINCE          = 10
 
   # TCP: Use Traffic Light Color Palette
   COLORS_TCP_STATE = {
@@ -92,6 +93,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
           .push("Local Port")
           .push("Remote Address")
           .push("Remote Port")
+          .push("Since")
       )
     end
 
@@ -188,7 +190,8 @@ class ConnsTableView < RubyQt6::Bando::QWidget
         initialize_standarditem(initialize_icon_ipaddress(conn.local_address), conn.local_address),
         initialize_standarditem(conn.local_port.to_s),
         initialize_standarditem(initialize_icon_ipaddress(conn.remote_address), conn.remote_address),
-        initialize_standarditem(conn.remote_port.to_s)
+        initialize_standarditem(conn.remote_port.to_s),
+        initialize_standarditem(conn.created_at.to_s)
       )
 
       @active_processes.add(comm)

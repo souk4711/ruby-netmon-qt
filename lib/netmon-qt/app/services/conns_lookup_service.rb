@@ -15,12 +15,12 @@ class ConnsLookupService
     end
 
     Dir.glob("/proc/[1-9]*/fd/[1-9]*") do |filepath|
-      ino = File.stat(filepath).ino
-      conn = ino2conn[ino]
+      conn = ino2conn[File.stat(filepath).ino]
       next if conn.nil?
 
       conn.pid = filepath.split("/")[2].to_i
       conn.comm = File.read("/proc/#{conn.pid}/comm").strip
+      conn.created_at = File.lstat(filepath).ctime
     rescue Errno::EACCES, Errno::ENOENT
     end
 
@@ -40,7 +40,7 @@ class ConnsLookupService
     when "udp6"
       Netmon::Connection::PROTOCOL_UDP6
     else
-      ""
+      raise "Unknown connection protocol: #{str}"
     end
   end
 end
