@@ -49,7 +49,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
 
     def initialize(parent)
       @geoiolookup = begin
-        MaxMind::DB.new(NetmonQt.settings.GET_geolite2_mmdb, mode: MaxMind::DB::MODE_MEMORY)
+        MaxMind::DB.new(NetmonQt.settings.GET_geoip_country_mmdb, mode: MaxMind::DB::MODE_MEMORY)
       rescue Errno::EACCES, Errno::ENOENT
       end
 

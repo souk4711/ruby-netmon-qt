@@ -14,12 +14,12 @@ class ConnsLookupService
       end
     end
 
-    Dir.glob("/proc/[1-9]*/fd/[1-9]*") do |dir|
-      ino = File.stat(dir).ino
+    Dir.glob("/proc/[1-9]*/fd/[1-9]*") do |filepath|
+      ino = File.stat(filepath).ino
       conn = ino2conn[ino]
       next if conn.nil?
 
-      conn.pid = dir.split("/")[2].to_i
+      conn.pid = filepath.split("/")[2].to_i
       conn.comm = File.read("/proc/#{conn.pid}/comm").strip
     rescue Errno::EACCES, Errno::ENOENT
     end

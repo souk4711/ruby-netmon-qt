@@ -16,8 +16,8 @@ module NetmonQt
       default_connections_check_interval
     end
 
-    def GET_geolite2_mmdb
-      default_geolite2_mmdb
+    def GET_geoip_country_mmdb
+      default_geoip_country_mmdb
     end
 
     private
@@ -26,8 +26,15 @@ module NetmonQt
       4_000
     end
 
-    def default_geolite2_mmdb
-      "/usr/share/GeoIP/GeoLite2-Country.mmdb"
+    def default_geoip_country_mmdb
+      candidates = [
+        "/usr/local/share/GeoIP/Country.mmdb",
+        "/usr/local/share/GeoIP/GeoLite2-Country.mmdb",
+        "/usr/share/GeoIP/Country.mmdb",
+        "/usr/share/GeoIP/GeoLite2-Country.mmdb"
+      ]
+      candidates.each { |filepath| return filepath if File.exist?(filepath) }
+      candidates[0]
     end
   end
 end
