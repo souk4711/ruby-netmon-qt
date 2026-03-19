@@ -39,8 +39,6 @@ class ConnsLookupService
       Netmon::Connection::PROTOCOL_UDP4
     when "udp6"
       Netmon::Connection::PROTOCOL_UDP6
-    else
-      raise "Unknown connection protocol: #{str}"
     end
   end
 end
