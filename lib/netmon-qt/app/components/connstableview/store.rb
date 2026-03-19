@@ -152,7 +152,7 @@ class ConnsTableView < RubyQt6::Bando::QWidget
     def initialize_icon_ipaddress(ipaddress)
       return if @geoiolookup.nil?
 
-      islocal = Netmon.local_address?(ipaddress)
+      islocal = Netmon::LocalAddressChecker.local?(ipaddress)
       return QIcon.from_theme(QIcon::ThemeIcon::Computer) if islocal
 
       record = @geoiolookup.get(ipaddress)
