@@ -9,13 +9,14 @@ Gem::Specification.new do |spec|
   spec.email = ["johndoe@example.com"]
 
   spec.summary = "A simple network monitor on Linux."
-  spec.description = "A simple network monitor on Linux."
+  # spec.description = "A simple network monitor on Linux."
+  spec.licenses = "GPL-3.0-only"
   spec.homepage = "https://github.com/souk4711/ruby-netmon-qt"
   spec.required_ruby_version = ">= 3.3.0"
 
-  spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/souk4711/ruby-netmon-qt"
-  spec.metadata["changelog_uri"] = "https://github.com/souk4711/ruby-netmon-qt"
+  # spec.metadata["homepage_uri"] = spec.homepage
+  # spec.metadata["source_code_uri"] = "https://github.com/souk4711/ruby-netmon-qt"
+  # spec.metadata["changelog_uri"] = "https://github.com/souk4711/ruby-netmon-qt"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
