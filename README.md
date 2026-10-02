@@ -1,4 +1,4 @@
-# NetmonQt
+# RubyNetmonQt
 
 A simple network monitor on Linux.
 
@@ -18,7 +18,7 @@ gem install ruby-netmon-qt
 To launch the GUI:
 
 ```sh
-netmon-qt
+ruby-netmon-qt
 ```
 
 ## Screenshot
