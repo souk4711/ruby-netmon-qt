@@ -17,7 +17,8 @@ module NetmonQt
     end
 
     def exec
-      Contrib::SigHandler.new(@app)
+      handler = Ctrlc::Handler.new
+      handler.exec
 
       @mainwindow.show
       @app.exec
