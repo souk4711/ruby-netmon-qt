@@ -1,7 +1,6 @@
 require_relative "config"
 require_relative "lib"
 
-require_relative "app/components"
 require_relative "app/services"
 require_relative "app/views"
 

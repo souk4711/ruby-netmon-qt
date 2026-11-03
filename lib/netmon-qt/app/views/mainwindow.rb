@@ -1,3 +1,5 @@
+require_relative "mainwindow/components"
+
 class MainWindow < RubyQt6::Bando::QMainWindow
   q_object do
   end
