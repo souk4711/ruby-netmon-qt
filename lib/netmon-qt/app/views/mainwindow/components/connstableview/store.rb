@@ -1,4 +1,4 @@
-class ConnsTableView < RubyQt6::Bando::QWidget
+class MainWindowConnsTableView < RubyQt6::Bando::QWidget
   # rubocop:disable Layout
   COLUMN_CONNECTION_KEY = 0
   COLUMN_PROCESS_NAME   = 1

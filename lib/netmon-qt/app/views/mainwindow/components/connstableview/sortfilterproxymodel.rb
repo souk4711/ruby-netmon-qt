@@ -1,4 +1,4 @@
-class ConnsTableView < RubyQt6::Bando::QWidget
+class MainWindowConnsTableView < RubyQt6::Bando::QWidget
   class SortFilterProxyModel < RubyQt6::Bando::QSortFilterProxyModel
     def filter_accepts_row(source_row, source_parent)
       {

@@ -1,4 +1,4 @@
-class ConnsTableView < RubyQt6::Bando::QWidget
+class MainWindowConnsTableView < RubyQt6::Bando::QWidget
   class StatusBar < RubyQt6::Bando::QWidget
     def initialize(storeproxymodel)
       super()

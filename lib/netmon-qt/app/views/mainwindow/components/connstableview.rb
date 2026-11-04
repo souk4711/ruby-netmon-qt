@@ -2,7 +2,7 @@ require_relative "connstableview/sortfilterproxymodel"
 require_relative "connstableview/statusbar"
 require_relative "connstableview/store"
 
-class ConnsTableView < RubyQt6::Bando::QWidget
+class MainWindowConnsTableView < RubyQt6::Bando::QWidget
   QSS_BUTTON_AUTOREFRESH = "
     QPushButton {
       background: #EFF0F1;
